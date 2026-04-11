@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Salon Booking Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f5f5f5;
+    }
+
+    header {
+      background: #111;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: black;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #333;
+    }
+
+    /* Chatbot */
+    #chatbot {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 300px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      display: none;
+      flex-direction: column;
+    }
+
+    #chat-header {
+      background: black;
+      color: white;
+      padding: 10px;
+      border-radius: 10px 10px 0 0;
+    }
+
+    #chat-body {
+      padding: 10px;
+      height: 200px;
+      overflow-y: auto;
+      font-size: 14px;
+    }
+
+    #chat-input {
+      display: flex;
+    }
+
+    #chat-input input {
+      flex: 1;
+      border: none;
+      padding: 10px;
+    }
+
+    #chat-input button {
+      width: 80px;
+    }
+
+    #chat-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: black;
+      color: white;
+      padding: 15px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Glow Salon</h1>
+  <p>Book Your Appointment Instantly</p>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h2>Book Appointment</h2>
+
+    <input type="text" placeholder="Your Name" id="name">
+    <input type="date" id="date">
+
+    <select id="service">
+      <option>Haircut</option>
+      <option>Hair Coloring</option>
+      <option>Braids</option>
+    </select>
+
+    <button onclick="book()">Book Now</button>
+
+    <p id="msg"></p>
+  </div>
+
+</div>
+
+<!-- Chatbot -->
+<div id="chatbot">
+  <div id="chat-header">Salon Assistant 🤖</div>
+  <div id="chat-body"></div>
+
+  <div id="chat-input">
+    <input type="text" id="userInput" placeholder="Ask something...">
+    <button onclick="send()">Send</button>
+  </div>
+</div>
+
+<div id="chat-toggle" onclick="toggleChat()">💬</div>
+<script>
+  function book() {
+    let name = document.getElementById("name").value;
+    let date = document.getElementById("date").value;
+
+    if (!name || !date) {
+      document.getElementById("msg").innerText = "Please fill all fields";
+      return;
+    }
+
+    document.getElementById("msg").innerText =
+      "Appointment booked for " + name + " on " + date;
+  }
+
+  function toggleChat() {
+    let chat = document.getElementById("chatbot");
+    chat.style.display = chat.style.display === "flex" ? "none" : "flex";
+  }
+
+  async function send() {
+    let input = document.getElementById("userInput");
+    let text = input.value.trim();
+    let chatBody = document.getElementById("chat-body");
+
+    if (!text) return;
+
+    chatBody.innerHTML += "<p><b>You:</b> " + text + "</p>";
+
+    try {
+      const res = await fetch("http://localhost:3000/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text })
+      });
+
+      const data = await res.json();
+      chatBody.innerHTML += "<p><b>Bot:</b> " + data.reply + "</p>";
+    } catch (error) {
+      chatBody.innerHTML += "<p><b>Bot:</b> Sorry, something went wrong.</p>";
+    }
+
+    chatBody.scrollTop = chatBody.scrollHeight;
+    input.value = "";
+  }
+
+  // Enter key support
+  document.getElementById("userInput").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+      send();
+    }
+  });
+</script>
+</body>
+</html>
