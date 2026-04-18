@@ -2,199 +2,351 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Salon Booking Demo</title>
+  <title>Glow Salon — Book Your Appointment</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background: #f5f5f5;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #fafafa; color: #222; }
 
     header {
       background: #111;
       color: white;
-      padding: 20px;
+      padding: 28px 20px;
       text-align: center;
     }
+    header h1 { font-size: 2rem; letter-spacing: 2px; }
+    header p  { margin-top: 6px; color: #ccc; font-size: 0.95rem; }
 
-    .container {
-      padding: 20px;
-      max-width: 900px;
-      margin: auto;
-    }
+    .container { max-width: 960px; margin: auto; padding: 24px 16px; }
+
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
 
     .card {
       background: white;
-      padding: 20px;
-      margin-top: 20px;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    .card h2 { margin-bottom: 16px; font-size: 1.1rem; border-bottom: 2px solid #111; padding-bottom: 8px; }
+
+    /* Services */
+    .service-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 0.95rem;
+    }
+    .service-item:last-child { border-bottom: none; }
+    .service-price { font-weight: bold; color: #111; }
+    .service-duration { font-size: 0.8rem; color: #888; }
+
+    /* Hours */
+    .hours-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 0.9rem; border-bottom: 1px solid #f5f5f5; }
+    .hours-row:last-child { border-bottom: none; }
+    .closed { color: #e44; font-weight: bold; }
+
+    /* Booking form */
+    label { display: block; margin-top: 14px; font-size: 0.85rem; font-weight: 600; color: #555; }
+    input, select {
+      width: 100%; padding: 10px 12px; margin-top: 6px;
+      border: 1px solid #ddd; border-radius: 8px; font-size: 0.95rem;
+    }
+    input:focus, select:focus { outline: 2px solid #111; border-color: #111; }
+
+    .btn {
+      display: block; width: 100%; padding: 12px;
+      margin-top: 18px; background: #111; color: white;
+      border: none; border-radius: 8px; font-size: 1rem;
+      cursor: pointer; font-weight: bold;
+    }
+    .btn:hover { background: #333; }
+
+    .confirm-box {
+      display: none; margin-top: 16px; padding: 16px;
+      background: #f0fff4; border: 1px solid #25D366;
+      border-radius: 10px; font-size: 0.9rem; line-height: 1.7;
+    }
+    .wa-btn {
+      display: inline-block; margin-top: 12px; padding: 10px 18px;
+      background: #25D366; color: white; border-radius: 8px;
+      text-decoration: none; font-weight: bold; font-size: 0.9rem;
     }
 
-    input, select, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
+    /* Info section */
+    .info-item { display: flex; gap: 10px; margin-bottom: 14px; align-items: flex-start; font-size: 0.9rem; }
+    .info-icon { font-size: 1.2rem; min-width: 28px; }
 
-    button {
-      background: black;
-      color: white;
-      cursor: pointer;
-    }
+    /* Staff */
+    .staff-card { display: flex; gap: 12px; align-items: center; margin-bottom: 14px; }
+    .staff-avatar { width: 44px; height: 44px; background: #111; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; }
+    .staff-info small { color: #888; }
 
-    button:hover {
-      background: #333;
+    /* Floating buttons */
+    #wa-float {
+      position: fixed; bottom: 90px; right: 20px;
+      background: #25D366; color: white; padding: 12px 18px;
+      border-radius: 50px; text-decoration: none; font-weight: bold;
+      font-size: 0.9rem; box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+      display: flex; align-items: center; gap: 6px; z-index: 999;
+    }
+    #chat-toggle {
+      position: fixed; bottom: 20px; right: 20px;
+      background: #111; color: white; width: 54px; height: 54px;
+      border-radius: 50%; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; font-size: 1.4rem;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25); z-index: 999;
     }
 
     /* Chatbot */
     #chatbot {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 300px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-      display: none;
-      flex-direction: column;
+      position: fixed; bottom: 84px; right: 20px; width: 320px;
+      background: white; border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+      display: none; flex-direction: column; z-index: 998; overflow: hidden;
     }
-
     #chat-header {
-      background: black;
-      color: white;
-      padding: 10px;
-      border-radius: 10px 10px 0 0;
+      background: #111; color: white; padding: 14px 16px;
+      font-weight: bold; display: flex; justify-content: space-between; align-items: center;
     }
-
-    #chat-body {
-      padding: 10px;
-      height: 200px;
-      overflow-y: auto;
-      font-size: 14px;
-    }
-
-    #chat-input {
-      display: flex;
-    }
-
-    #chat-input input {
-      flex: 1;
-      border: none;
-      padding: 10px;
-    }
-
-    #chat-input button {
-      width: 80px;
-    }
-
-    #chat-toggle {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: black;
-      color: white;
-      padding: 15px;
-      border-radius: 50%;
-      cursor: pointer;
-    }
+    #chat-body { padding: 12px; height: 220px; overflow-y: auto; font-size: 0.88rem; line-height: 1.5; }
+    .msg { margin-bottom: 10px; }
+    .msg.user { text-align: right; }
+    .msg.user span { background: #111; color: white; padding: 7px 12px; border-radius: 12px 12px 2px 12px; display: inline-block; }
+    .msg.bot span  { background: #f0f0f0; padding: 7px 12px; border-radius: 12px 12px 12px 2px; display: inline-block; }
+    #chat-input-row { display: flex; border-top: 1px solid #eee; }
+    #chat-input-row input { flex: 1; border: none; padding: 12px; font-size: 0.9rem; outline: none; }
+    #chat-input-row button { background: #111; color: white; border: none; padding: 12px 16px; cursor: pointer; font-size: 0.9rem; }
   </style>
 </head>
 <body>
 
+<!-- ── Config (edit this to customize for any salon) ── -->
+<script>
+const SALON = {
+  name:      "Glow Salon",
+  tagline:   "Book Your Appointment Instantly",
+  whatsapp:  "+923170203221",
+  phone:     "+923170203221",
+  email:     "info@glowsalon.com",
+  location:  "Main Boulevard, Lahore",
+  currency:  "PKR",
+  services: [
+    { name: "Haircut",       price: 500,  duration: "30 min"  },
+    { name: "Hair Coloring", price: 2000, duration: "2 hours" },
+    { name: "Braids",        price: 1500, duration: "1.5 hrs" },
+    { name: "Facial",        price: 1200, duration: "1 hour"  },
+    { name: "Manicure",      price: 800,  duration: "45 min"  }
+  ],
+  hours: {
+    Monday:    "10:00 AM – 8:00 PM",
+    Tuesday:   "10:00 AM – 8:00 PM",
+    Wednesday: "10:00 AM – 8:00 PM",
+    Thursday:  "10:00 AM – 8:00 PM",
+    Friday:    "10:00 AM – 8:00 PM",
+    Saturday:  "10:00 AM – 8:00 PM",
+    Sunday:    "Closed"
+  },
+  staff: [
+    { name: "Sara",   specialty: "Hair Coloring & Cuts" },
+    { name: "Ayesha", specialty: "Braids & Styling"     }
+  ]
+};
+</script>
+
 <header>
-  <h1>Glow Salon</h1>
-  <p>Book Your Appointment Instantly</p>
+  <h1 id="salon-name"></h1>
+  <p id="salon-tagline"></p>
 </header>
 
 <div class="container">
+  <div class="grid">
 
-  <div class="card">
-    <h2>Book Appointment</h2>
+    <!-- Services -->
+    <div class="card">
+      <h2>💇 Services & Prices</h2>
+      <div id="services-list"></div>
+    </div>
 
-    <input type="text" placeholder="Your Name" id="name">
-    <input type="date" id="date">
+    <!-- Booking Form -->
+    <div class="card">
+      <h2>📅 Book Appointment</h2>
+      <label>Your Name</label>
+      <input type="text" id="b-name" placeholder="e.g. Sara">
 
-    <select id="service">
-      <option>Haircut</option>
-      <option>Hair Coloring</option>
-      <option>Braids</option>
-    </select>
+      <label>Service</label>
+      <select id="b-service"></select>
 
-    <button onclick="book()">Book Now</button>
+      <label>Date</label>
+      <input type="date" id="b-date">
 
-    <p id="msg"></p>
+      <label>Preferred Time</label>
+      <input type="time" id="b-time">
+
+      <button class="btn" onclick="book()">Book Now ✅</button>
+      <p id="b-msg" style="color:red;margin-top:10px;font-size:0.85rem;"></p>
+
+      <div class="confirm-box" id="confirm-box">
+        ✅ <strong>Appointment Confirmed!</strong><br>
+        <span id="confirm-details"></span>
+        <br><br>
+        <a id="wa-confirm" href="#" target="_blank" class="wa-btn">📲 Confirm on WhatsApp</a>
+      </div>
+    </div>
+
+    <!-- Hours -->
+    <div class="card">
+      <h2>🕐 Business Hours</h2>
+      <div id="hours-list"></div>
+    </div>
+
+    <!-- Info + Staff -->
+    <div class="card">
+      <h2>📍 Find Us</h2>
+      <div id="info-block"></div>
+      <h2 style="margin-top:20px;margin-bottom:14px;font-size:1rem;">👩‍🎨 Our Team</h2>
+      <div id="staff-list"></div>
+    </div>
+
   </div>
-
 </div>
+
+<!-- WhatsApp float + chat toggle -->
+<a id="wa-float" href="#" target="_blank">📲 WhatsApp Us</a>
+<div id="chat-toggle" onclick="toggleChat()">💬</div>
 
 <!-- Chatbot -->
 <div id="chatbot">
-  <div id="chat-header">Salon Assistant 🤖</div>
+  <div id="chat-header">
+    <span>🤖 Salon Assistant</span>
+    <span onclick="toggleChat()" style="cursor:pointer;font-size:1.1rem;">✕</span>
+  </div>
   <div id="chat-body"></div>
-
-  <div id="chat-input">
-    <input type="text" id="userInput" placeholder="Ask something...">
-    <button onclick="send()">Send</button>
+  <div id="chat-input-row">
+    <input type="text" id="chat-input" placeholder="Ask something...">
+    <button onclick="sendMsg()">Send</button>
   </div>
 </div>
 
-<div id="chat-toggle" onclick="toggleChat()">💬</div>
 <script>
-  function book() {
-    let name = document.getElementById("name").value;
-    let date = document.getElementById("date").value;
+// ── Render from config ────────────────────────────────────────────────────────
 
-    if (!name || !date) {
-      document.getElementById("msg").innerText = "Please fill all fields";
-      return;
-    }
+document.getElementById("salon-name").textContent    = SALON.name;
+document.getElementById("salon-tagline").textContent = SALON.tagline;
+document.getElementById("wa-float").href =
+  `https://wa.me/${SALON.whatsapp.replace(/\D/g,"")}?text=Hi%20${encodeURIComponent(SALON.name)}!%20I%27d%20like%20to%20book%20an%20appointment.`;
 
-    document.getElementById("msg").innerText =
-      "Appointment booked for " + name + " on " + date;
+// Services
+const svcList = document.getElementById("services-list");
+const svcSel  = document.getElementById("b-service");
+SALON.services.forEach(s => {
+  svcList.innerHTML +=
+    `<div class="service-item">
+       <span>${s.name}<br><span class="service-duration">${s.duration}</span></span>
+       <span class="service-price">${SALON.currency} ${s.price.toLocaleString()}</span>
+     </div>`;
+  svcSel.innerHTML += `<option value="${s.name}">${s.name} — ${SALON.currency} ${s.price}</option>`;
+});
+
+// Hours
+const today = new Date().toLocaleDateString("en-US", { weekday: "long" });
+Object.entries(SALON.hours).forEach(([day, time]) => {
+  const closed  = time === "Closed";
+  const isToday = day === today;
+  document.getElementById("hours-list").innerHTML +=
+    `<div class="hours-row" style="${isToday ? "font-weight:bold;" : ""}">
+       <span>${day}${isToday ? " (Today)" : ""}</span>
+       <span class="${closed ? "closed" : ""}">${time}</span>
+     </div>`;
+});
+
+// Info
+document.getElementById("info-block").innerHTML =
+  `<div class="info-item"><span class="info-icon">📍</span><span>${SALON.location}</span></div>
+   <div class="info-item"><span class="info-icon">📞</span><span>${SALON.phone}</span></div>
+   <div class="info-item"><span class="info-icon">✉️</span><span>${SALON.email}</span></div>`;
+
+// Staff
+SALON.staff.forEach(m => {
+  document.getElementById("staff-list").innerHTML +=
+    `<div class="staff-card">
+       <div class="staff-avatar">${m.name[0]}</div>
+       <div class="staff-info"><strong>${m.name}</strong><br><small>${m.specialty}</small></div>
+     </div>`;
+});
+
+// ── Booking ───────────────────────────────────────────────────────────────────
+
+function book() {
+  const name    = document.getElementById("b-name").value.trim();
+  const service = document.getElementById("b-service").value;
+  const date    = document.getElementById("b-date").value;
+  const time    = document.getElementById("b-time").value;
+  const msgEl   = document.getElementById("b-msg");
+
+  if (!name || !date || !time) {
+    msgEl.textContent = "⚠️ Please fill in all fields.";
+    return;
   }
+  msgEl.textContent = "";
 
-  function toggleChat() {
-    let chat = document.getElementById("chatbot");
-    chat.style.display = chat.style.display === "flex" ? "none" : "flex";
+  const dateStr = new Date(date).toLocaleDateString("en-PK", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+  const timeStr = new Date(`2000-01-01T${time}`).toLocaleTimeString("en-PK", { hour: "2-digit", minute: "2-digit" });
+
+  document.getElementById("confirm-details").innerHTML =
+    `👤 ${name} &nbsp;|&nbsp; 💇 ${service}<br>📅 ${dateStr} &nbsp;|&nbsp; ⏰ ${timeStr}`;
+
+  const waText = encodeURIComponent(
+    `Hi ${SALON.name}! I'd like to confirm my appointment:\nName: ${name}\nService: ${service}\nDate: ${dateStr}\nTime: ${timeStr}`
+  );
+  document.getElementById("wa-confirm").href =
+    `https://wa.me/${SALON.whatsapp.replace(/\D/g,"")}?text=${waText}`;
+
+  document.getElementById("confirm-box").style.display = "block";
+  document.getElementById("confirm-box").scrollIntoView({ behavior: "smooth" });
+}
+
+// ── Chatbot ───────────────────────────────────────────────────────────────────
+
+function toggleChat() {
+  const c = document.getElementById("chatbot");
+  const isOpen = c.style.display === "flex";
+  c.style.display = isOpen ? "none" : "flex";
+  if (!isOpen && document.getElementById("chat-body").innerHTML === "") {
+    appendMsg("bot", `👋 Hi! Welcome to ${SALON.name}. Ask me about services, hours, or type *book* to make an appointment!`);
   }
+}
 
-  async function send() {
-    let input = document.getElementById("userInput");
-    let text = input.value.trim();
-    let chatBody = document.getElementById("chat-body");
+function appendMsg(from, text) {
+  const body = document.getElementById("chat-body");
+  body.innerHTML += `<div class="msg ${from}"><span>${text}</span></div>`;
+  body.scrollTop = body.scrollHeight;
+}
 
-    if (!text) return;
-
-    chatBody.innerHTML += "<p><b>You:</b> " + text + "</p>";
-
-    try {
-      const res = await fetch("/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text })
-      });
-
-      const data = await res.json();
-      chatBody.innerHTML += "<p><b>Bot:</b> " + data.reply + "</p>";
-    } catch (error) {
-      chatBody.innerHTML += "<p><b>Bot:</b> Sorry, something went wrong.</p>";
-    }
-
-    chatBody.scrollTop = chatBody.scrollHeight;
-    input.value = "";
+async function sendMsg() {
+  const input = document.getElementById("chat-input");
+  const text  = input.value.trim();
+  if (!text) return;
+  appendMsg("user", text);
+  input.value = "";
+  try {
+    const res  = await fetch("/chat", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ message: text }),
+    });
+    const data = await res.json();
+    appendMsg("bot", data.reply);
+  } catch {
+    appendMsg("bot", "Sorry, something went wrong. Please try again.");
   }
+}
 
-  // Enter key support
-  document.getElementById("userInput").addEventListener("keypress", function(e) {
-    if (e.key === "Enter") {
-      send();
-    }
-  });
+document.getElementById("chat-input").addEventListener("keypress", e => {
+  if (e.key === "Enter") sendMsg();
+});
 </script>
 </body>
 </html>
