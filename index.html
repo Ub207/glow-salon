@@ -85,13 +85,6 @@
     .staff-info small { color: #888; }
 
     /* Floating buttons */
-    #wa-float {
-      position: fixed; bottom: 90px; right: 20px;
-      background: #25D366; color: white; padding: 12px 18px;
-      border-radius: 50px; text-decoration: none; font-weight: bold;
-      font-size: 0.9rem; box-shadow: 0 4px 14px rgba(0,0,0,0.2);
-      display: flex; align-items: center; gap: 6px; z-index: 999;
-    }
     #chat-toggle {
       position: fixed; bottom: 20px; right: 20px;
       background: #111; color: white; width: 54px; height: 54px;
@@ -213,8 +206,7 @@ const SALON = {
   </div>
 </div>
 
-<!-- WhatsApp float + chat toggle -->
-<a id="wa-float" href="#" target="_blank">📲 WhatsApp Us</a>
+<!-- Chat toggle only -->
 <div id="chat-toggle" onclick="toggleChat()">💬</div>
 
 <!-- Chatbot -->
