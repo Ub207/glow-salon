@@ -227,8 +227,6 @@ const SALON = {
 
 document.getElementById("salon-name").textContent    = SALON.name;
 document.getElementById("salon-tagline").textContent = SALON.tagline;
-document.getElementById("wa-float").href =
-  `https://wa.me/${SALON.whatsapp.replace(/\D/g,"")}?text=Hi%20${encodeURIComponent(SALON.name)}!%20I%27d%20like%20to%20book%20an%20appointment.`;
 
 // Services
 const svcList = document.getElementById("services-list");
