@@ -3,3 +3,4 @@ node_modules/
 .qwen/
 .netlify/
 .vercel/
+.vercel
